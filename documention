@@ -1,0 +1,9 @@
+knight is at [3, 3] we have to consider every possible moves of the knight in the the subtree.
+
+[-1, -1] == [2, 2] so it's the upper left and we may have two moves if they are not off board.
+
+[-1, +1] == [2, 4] upper right moves
+ 
+[+1, -1] == [4, 2] lower left 
+
+[+1, +1] == [4, 4] lower right
