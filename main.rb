@@ -29,9 +29,9 @@ class Tree
   end
 
   def build_tree(array = nil, start_arr = 0, end_arr = 0, count = 0)
-    
+    # binding.pry
     return nil if start_arr > end_arr 
-    array = @array.uniq if count == 0 && array.nil?
+    array = @array if count == 0 && array.nil?
     count += 1
     start_arr = 0
     end_arr = array.length - 1
@@ -48,6 +48,30 @@ class Tree
     pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
   end
 
+  def insert(value, root = nil, inserted = false)
+
+    evalu = value[0]
+    root = @root if root == nil 
+    return nil if inserted
+    inserted = false
+    if evalu > 4
+      if root.left == nil
+        root.left = Node.new(value)
+        inserted = true
+      else
+        root = root.left
+      end
+    end
+    if evalu < 4
+      if root.right == nil
+        root.right = Node.new(value)
+        inserted = true
+      end
+      root = root.right
+    end
+    
+    insert(value, root, inserted)
+  end
   
 end
 
@@ -56,9 +80,10 @@ class Board
     @board = Array.new(8) { [*0..7] }
     @array = []
     @knight = nil
-    @trees = []
+    @tree = nil
+    @hashes = []
   end
-  attr_accessor :board, :array, :trees
+  attr_accessor :board, :array, :tree, :hashes
 
   def show_square(row, col)
     p @board[row][col]
@@ -70,25 +95,45 @@ class Board
   # until all of the squares are visited then find the shortest path, using BFS and DFS to find the destination
   def knight_moves(starting_square, destination_square)
     @knight = Knight.new(self, starting_square, board)
-    @knight.rec(starting_square[0], starting_square[1])
     i = 0
-    until (@array[i][0] ==7 && @array[i][1] == 7) do
+    @knight.rec(starting_square[0], starting_square[1], i)
+    binding.pry
+    x = 0
+    until (@array[x] == nil) do
+      binding.pry
+      
 
-      # binding.pry
-      for moves in @array 
+    if i == 0 
+      array = @array
+      @array = []
+      curr_square = @array[x].to_s
+      @knight.rec(array[x][0], array[x][1], x, curr_square)
+      i += 1
+    else
+      # should use the first hash to recurse
+      
+      curr_square = @hashes.first
+      @knight.rec(array[x][0], array[x][1], x, curr_square)
+      x += 1
+    end
+      
+
+
+      for moves in array
+
         if moves == destination_square
+
           puts "#{starting_square}" 
-          puts "#{destination_square}" 
+          puts "[#{array[0][0]}, #{array[0][1]}]"
+          puts "#{destination_square}"
+
+          
           return 
         end
       end
-      my_tree = Tree.new(@array)
-      my_tree.build_tree
-      my_tree.pretty_print
-      @knight.rec(@array[i][0], @array[i][1])
-      i += 1
-
+      
     end
+    i += 1
 
     
   end
@@ -100,9 +145,29 @@ class Board
     end
   end
 
-  def possible_moves(row, col)
-    # binding.pry
-    @array << [row, col]
+  def possible_moves(j, i, start, curr_square = nil, row = false, col = false)
+    
+    if !(row == false) && j!= 7
+      @array << [row, col] 
+    elsif j == 7 && i == 0 && @hashes[0].nil?
+      @array << [row, col]
+      binding.pry
+      array_name = start.to_s
+      array = @array 
+      hash = Hash.new 
+      hash[array_name] = array
+      @hashes = hash
+    elsif j == 7 && i > 0 
+      @array << [row, col]
+      binding.pry
+      array_name = curr_square
+      array = @array 
+      hash = Hash.new 
+      hash[array_name] = array
+      @hashes << hash
+    end
+    # @tree.insert([row, col]) if !(@tree.nil?) && !(row == false)
+    # here insert it in the tree but at the right level
   end
 end
 
@@ -114,8 +179,8 @@ class Knight
     @board = board
   end
 
-  def rec(row, col)
-    # binding.pry
+  def rec(row, col, i, curr_square = nil)
+    
   steps_row = [
         -2, 
         -2, 
@@ -137,20 +202,28 @@ class Knight
         -2,
         +2
       ]
-      i = 0
+      j = 0
       new_row = nil
       new_col = nil
+
       # i have my start square and i can probably make a tree of possible moves from that square and
       # then a tree of possible moves from it's children
-      for rowx in steps_row
-        # binding.pry
-        new_row = rowx + row
-        
-        new_col = steps_col[i] + col
-         
-        @game.possible_moves(new_row, new_col) if (0..7).include?(new_row) && (0..7).include?(new_col)
+      if row == false
+        @game.possible_moves(j, i)
+        j += 1
+      else
+        for rowx in steps_row
+
+          new_row = rowx + row
           
-        i += 1
+          new_col = steps_col[j] + col
+          p j 
+          if (0..7).include?(new_row) && (0..7).include?(new_col)
+            @game.possible_moves(j, i, @start, curr_square, new_row, new_col) 
+          end
+          j += 1
+            
+        end
       end
 
 
@@ -163,6 +236,6 @@ board = Board.new
 
 board.display_board
 
-board.knight_moves([0, 0], [7, 7])
+board.knight_moves([3, 3], [4, 3])
 
 p board.array
