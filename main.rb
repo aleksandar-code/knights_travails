@@ -97,45 +97,61 @@ class Board
     @knight = Knight.new(self, starting_square, board)
     i = 0
     @knight.rec(starting_square[0], starting_square[1], i)
-    binding.pry
+    
+    array1 = false
     x = 0
-    until (@array[x] == nil) do
-      binding.pry
+    # Get my first 2 levels of moves => [{"[3, 3]"=>[[1, 2], [1, 4], [2, 1], [2, 5], [5, 2], [5, 4], [4, 1], [4, 5]]}
+    until (@array[x] == nil && array1[x] == nil) do
+     
+      if x == 0
+        array1 = @array
+        @array = []
+      end
+        # should use the first hash to recurse
+        
+        @array = []
+        curr_square = array1[x].to_s
+        @knight.rec(array1[x][0], array1[x][1], x, curr_square)
+        x += 1
       
-
-    if i == 0 
-      array = @array
-      @array = []
-      curr_square = @array[x].to_s
-      @knight.rec(array[x][0], array[x][1], x, curr_square)
       i += 1
-    else
-      # should use the first hash to recurse
-      
-      curr_square = @hashes.first
-      @knight.rec(array[x][0], array[x][1], x, curr_square)
-      x += 1
     end
+    # third level
+    x = 0
+    @hashes[1..].each do |hash|
       
+      hash.each do |k, v|
+        
+        v.each do |value|
+          
+          curr_square = value.to_s
+          @array = []
+          @knight.rec(value[0], value[1], x, curr_square)
+          x += 1
+        end
+        x = 0
+      end
+    end
 
-
-      for moves in array
-
-        if moves == destination_square
-
-          puts "#{starting_square}" 
-          puts "[#{array[0][0]}, #{array[0][1]}]"
-          puts "#{destination_square}"
-
+    @hashes[1..].each do |hash|
+      
+      hash.each do |k, v|
+        
+        v.each do |value|
+         if value == destination_square
+          print "found #{hash}\n\n"
+          v.include?(starting_square)
+          # how can i define links between my squares?
           
           return 
+         end
         end
+        
       end
-      
     end
-    i += 1
+    binding.pry
+    p "p"
 
-    
   end
 
   def display_board
@@ -146,26 +162,26 @@ class Board
   end
 
   def possible_moves(j, i, start, curr_square = nil, row = false, col = false)
-    
-    if !(row == false) && j!= 7
-      @array << [row, col] 
-    elsif j == 7 && i == 0 && @hashes[0].nil?
+    if !(row == false) && j == 7
       @array << [row, col]
-      binding.pry
+    elsif !(row == false) && j < 7
+      @array << [row, col]
+    end
+    if j == 7 && @hashes.empty? 
       array_name = start.to_s
       array = @array 
       hash = Hash.new 
       hash[array_name] = array
-      @hashes = hash
-    elsif j == 7 && i > 0 
-      @array << [row, col]
-      binding.pry
+      @hashes << hash
+    elsif j == 7 
       array_name = curr_square
       array = @array 
       hash = Hash.new 
       hash[array_name] = array
       @hashes << hash
     end
+
+    p j 
     # @tree.insert([row, col]) if !(@tree.nil?) && !(row == false)
     # here insert it in the tree but at the right level
   end
@@ -209,17 +225,23 @@ class Knight
       # i have my start square and i can probably make a tree of possible moves from that square and
       # then a tree of possible moves from it's children
       if row == false
-        @game.possible_moves(j, i)
+        binding.pry
+        @game.possible_moves(j, i, @start, curr_square)
         j += 1
       else
         for rowx in steps_row
-
+          
           new_row = rowx + row
           
           new_col = steps_col[j] + col
-          p j 
+          
           if (0..7).include?(new_row) && (0..7).include?(new_col)
             @game.possible_moves(j, i, @start, curr_square, new_row, new_col) 
+          
+          else
+            
+            @game.possible_moves(j, i, @start, curr_square)
+          
           end
           j += 1
             
