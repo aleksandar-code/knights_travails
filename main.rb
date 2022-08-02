@@ -135,32 +135,83 @@ class Board
       end
     end
 
-    @hashes[1..].each do |hash|
-      
+   
+    # create a square in key for every square on the board first
+    keys = []
+    keys_new_hash = []
+    @hashes.each do |hash|
+      keys << hash.keys[0]
+    end
+    
+
+    @hashes.each do |hash|
       hash.each do |k, v|
-        
         v.each do |value|
-         if value == destination_square
-          @hashes[0].each do |key, value1|
-            value1.each do |v1|
-            puts "yes" if v1 === k || v.include?(v1)
-            puts "#{starting_square}"
-            puts "#{v1}"
-            puts "#{k}"
-            puts "#{destination_square}"
-            return if v1 == k || v.include?(v1)
-            
-            end
+          if !(keys.include?(value))
+            keys_new_hash << value
           end
-          
-          # how can i define links between my squares?
-          
-         
-         end
         end
-        
       end
     end
+    50.times do 
+      keys_new_hash = keys_new_hash.uniq
+      @hashes = @hashes.uniq
+
+      x = 0
+        keys_new_hash.each do |key|
+          1.times do
+            curr_square = key
+            @array = []
+            @knight.rec(key[0], key[1], x, curr_square)
+            x += 1
+          end
+          x = 0
+        end
+    end
+
+    # ok so just create the board with the 64 squares and then register all the moves in order
+    # so with keys and then i can search with my knight through the tree of keys.
+
+  # create hash of every square on the board, and with these i can construct a tree
+    @board.each_with_index do |row, ir|
+      row.each_with_index do |col, ic|
+        keys_new_hash << [ir, ic]
+      end
+    end
+
+    keys_new_hash.each do |key|
+      curr_square = key
+      @array = []
+      @knight.rec(key[0], key[1], x, curr_square)
+      x += 1
+    end
+
+    # create hash of every square on the board
+
+      @hashes[1..].each do |hash|
+      
+        hash.each do |k, v|
+          
+          v.each do |value|
+           if value == destination_square
+            @hashes[0].each do |key, value1|
+              value1.each do |v1|
+              puts "yes" if v1 === k || v.include?(v1)
+              if v1 == k || v.include?(v1)
+                puts "#{starting_square}"
+                puts "#{v1}"
+                puts "#{k}"
+                puts "#{destination_square}"
+                return 
+              end            
+              end
+            end
+           end
+          end
+        end
+      end
+
+
     binding.pry
     p "p"
 
@@ -193,7 +244,6 @@ class Board
       @hashes << hash
     end
 
-    p j 
     # @tree.insert([row, col]) if !(@tree.nil?) && !(row == false)
     # here insert it in the tree but at the right level
   end
@@ -270,6 +320,4 @@ board = Board.new
 
 board.display_board
 
-board.knight_moves([0, 0], [6, 1])
-
-board.display_board
+board.knight_moves([0, 0], [7, 7])
