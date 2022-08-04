@@ -131,31 +131,56 @@ class Graph
         current_list.push(dst_node)
 
     end
+# so first i'll have to get in the square 0,0 check if 3,3 is an edge, if not then check the children of the children of 0,0.
+# use DFS AND BFS, i want to take the children of my starting square 0,0 and then link them via paths to 3,3
 
-    def count_edges(src, dst)
+    # def dfs_bfs
+    #     check_edge()
+    #     count_edges()
+    # end
+
+    # data gives access to the nodes in a linked list SO if my dst_node isn't in the current linked list, i search in curr_node.next.data
+    # next gives acess to a adjacent node SO if my dst_node isn't equal to current node i look up the next node.
+
+    # 0,0
+    # Or i enter linkedlist 0,0; i check if the next node is equal dst node if not i then check if it is in his children i queue his children
+    # then i check if the next node is equal to dst_node if not i then check if it is in his children i queue his children
+    # 1,2 2,1
+    # Then i check the next node if it is equal to my dst node if not then i check in his children and i queue his children
+    # Then i check the next node if it is equal to my dst node if not then i check in his children and i queue his children
+    # and repeat this until i found 2 path to my dst_node as 0,0 gives to 2 moves (1,2 and 2,1)
+
+    # Result i checked 0,0 1,2 2,1 and queued the children of 1,2 and 2,1
+
+    def count_edges(src, dst, edges = 0)
         binding.pry
         current_list = @alist[src]
         dst_node = @alist[dst].head
         curr_node = current_list.head
         edges = 0 
-        until curr_node == nil
+        until curr_node == false
             if curr_node.data == dst_node
                 return edges + 1
             end
             edges += 1
-            curr_node = curr_node.next
+            if !(curr_node.nil?)
+                curr_node = curr_node.next
+                src = search_node(curr_node.data.data)
+                p check_edge(src, dst)
+            else
+                curr_node = false
+            end
         end
-        return false
+        
     end
 
     def check_edge(src, dst)
-        binding.pry
         current_list = @alist[src]
         dst_node = @alist[dst].head
         curr_node = current_list.head
         until curr_node == nil
             if curr_node.data == dst_node
-                return edges
+                return true
             end
             curr_node = curr_node.next
         end
@@ -208,27 +233,32 @@ class Board
     end
    
     # add edges
-    @board.each_with_index do |row, idx|
-        row.each do |col|
-            j = 0
-            8.times do 
+    
+        @board.each_with_index do |row, idx|
+            row.each do |col|
+                j = 0
+                8.times do 
 
-                data = @knight.rec(idx, col, j)
-                if !(data == nil)
-                    dst = @adjacency_list.search_node(data)  # get index of the dst
-                    data = [idx, col]
-                    src = @adjacency_list.search_node(data)  # get index of the dst
-                    @adjacency_list.add_edge(src, dst)
-                    
+                    data = @knight.rec(idx, col, j)
+                    if !(data == nil)
+                        dst = @adjacency_list.search_node(data)  # get index of the dst
+                        data = [idx, col]
+                        src = @adjacency_list.search_node(data)  # get index of the dst
+                        @adjacency_list.add_edge(src, dst)
+                        
+                    end
+                    j += 1
                 end
-                j += 1
             end
         end
-    end
-    starting_square = @adjacency_list.search_node(starting_square)
-    destination_square = @adjacency_list.search_node(destination_square)
-    p @adjacency_list.count_edges(starting_square, destination_square)
+    
 
+    starting_square = @adjacency_list.search_node(starting_square)
+
+    destination_square = @adjacency_list.search_node(destination_square)
+
+    p @adjacency_list.count_edges(starting_square, destination_square)
+    p @adjacency_list.print_
     binding.pry
 
   end
