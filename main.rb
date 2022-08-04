@@ -133,16 +133,19 @@ class Graph
     end
 
     def check_edge(src, dst)
+        binding.pry
         current_list = @alist[src]
-        dst_node = @alist[dst][0]
+        dst_node = @alist[dst].head
         curr_node = current_list.head
-        until curr_node.next == nil
-            curr_node = curr_node.next
-            if curr_node == dst_node
-                return true
+        edges = 0
+        until curr_node == nil
+            if curr_node.data == dst_node
+                return edges
             end
-            return false
+            edges += 1
+            curr_node = curr_node.next
         end
+        return false
     end
 
     def search_node(data)
@@ -200,16 +203,20 @@ class Board
                 if !(data == nil)
                     dst = @adjacency_list.search_node(data)  # get index of the dst
                     data = [idx, col]
-                    src =  @adjacency_list.search_node(data)  # get index of the dst
-                    @adjacency_list.add_edge(src, dst) 
+                    src = @adjacency_list.search_node(data)  # get index of the dst
+                    @adjacency_list.add_edge(src, dst)
+                    
                 end
                 j += 1
             end
         end
     end
+    starting_square = @adjacency_list.search_node(starting_square)
+    destination_square = @adjacency_list.search_node(destination_square)
+    @adjacency_list.check_edge(starting_square, destination_square)
 
     binding.pry
-    @adjacency_list.print_()
+
   end
   
   def display_board
