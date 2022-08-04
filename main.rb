@@ -132,17 +132,31 @@ class Graph
 
     end
 
+    def count_edges(src, dst)
+        binding.pry
+        current_list = @alist[src]
+        dst_node = @alist[dst].head
+        curr_node = current_list.head
+        edges = 0 
+        until curr_node == nil
+            if curr_node.data == dst_node
+                return edges + 1
+            end
+            edges += 1
+            curr_node = curr_node.next
+        end
+        return false
+    end
+
     def check_edge(src, dst)
         binding.pry
         current_list = @alist[src]
         dst_node = @alist[dst].head
         curr_node = current_list.head
-        edges = 0
         until curr_node == nil
             if curr_node.data == dst_node
                 return edges
             end
-            edges += 1
             curr_node = curr_node.next
         end
         return false
@@ -213,7 +227,7 @@ class Board
     end
     starting_square = @adjacency_list.search_node(starting_square)
     destination_square = @adjacency_list.search_node(destination_square)
-    @adjacency_list.check_edge(starting_square, destination_square)
+    p @adjacency_list.count_edges(starting_square, destination_square)
 
     binding.pry
 
@@ -281,4 +295,4 @@ board = Board.new
 
 board.display_board
 
-board.knight_moves([0, 0], [1, 2])
+board.knight_moves([0, 0], [3, 3])
