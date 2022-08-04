@@ -161,7 +161,6 @@ class Graph
             until curr_node.next == nil
                 i += 1
                 print "#{curr_node.data} -> "
-                print "#{curr_node.data.data} -> " if i > 0
                 curr_node = curr_node.next
             end
             print "\n"
