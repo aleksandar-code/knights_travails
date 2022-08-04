@@ -158,9 +158,10 @@ class Graph
         for current_list in @alist
             curr_node = current_list.head
             i = 0
-            until curr_node.next == nil
+            until curr_node == nil
+                print "#{curr_node.data} -> " if i == 0
+                print "#{curr_node.data.data} -> " if i > 0
                 i += 1
-                print "#{curr_node.data} -> "
                 curr_node = curr_node.next
             end
             print "\n"
