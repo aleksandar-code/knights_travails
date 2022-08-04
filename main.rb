@@ -14,6 +14,7 @@ class LinkedList
             return false
         end
     end
+    attr_accessor :head
     #push: given a data, add a new node in the end
     def push(data)
         if self.is_empty?
@@ -110,13 +111,70 @@ class Node
 
 end
 
+class Graph
+    def initialize
+        @alist = Array.new()
+    end
+    attr_accessor :alist
+
+    def add_node(row, col)
+        linked_list = LinkedList.new
+        linked_list.push([row, col])
+        @alist << linked_list
+    end
+
+    def add_edge(src, dst)
+        current_list = @alist[src]
+
+        dst_node = @alist[dst].head
+
+        current_list.push(dst_node)
+
+    end
+
+    def check_edge(src, dst)
+        current_list = @alist[src]
+        dst_node = @alist[dst][0]
+        curr_node = current_list.head
+        until curr_node.next == nil
+            curr_node = curr_node.next
+            if curr_node == dst_node
+                return true
+            end
+            return false
+        end
+    end
+
+    def search_node(data)
+
+        @alist.each_with_index do |list, idx|
+            if list.head.data == data
+                return idx
+            end
+        end
+    end
+
+    def print_()
+        for current_list in @alist
+            curr_node = current_list.head
+            i = 0
+            until curr_node.next == nil
+                i += 1
+                print "#{curr_node.data} -> "
+                print "#{curr_node.data.data} -> " if i > 0
+                curr_node = curr_node.next
+            end
+            print "\n"
+        end
+    end
+
+end
 
 class Board
   def initialize
     @board = Array.new(8) { [*0..7] }
-    @array = []
     @knight = nil
-    @adjacency_list = []
+    @adjacency_list = Graph.new
     
   end
   attr_accessor :board, :array, :adjacency_list
@@ -124,16 +182,34 @@ class Board
   def knight_moves(starting_square, destination_square)
     binding.pry
 
-    
+    @knight = Knight.new(self, starting_square, @board)
+    # add nodes.
     @board.each_with_index do |row, idx|
         row.each do |col|
-            linked_list = LinkedList.new
-            linked_list.push([idx, col])
-            linked_list.push(rec(idx, col))
-            @adjacency_list << linked_list
+            @adjacency_list.add_node(idx, col)
         end
     end
+   
+    # add edges
+    @board.each_with_index do |row, idx|
+        row.each do |col|
+            j = 0
+            8.times do 
+
+                data = @knight.rec(idx, col, j)
+                if !(data == nil)
+                    dst = @adjacency_list.search_node(data)  # get index of the dst
+                    data = [idx, col]
+                    src =  @adjacency_list.search_node(data)  # get index of the dst
+                    @adjacency_list.add_edge(src, dst) 
+                end
+                j += 1
+            end
+        end
+    end
+
     binding.pry
+    @adjacency_list.print_()
   end
   
   def display_board
@@ -153,9 +229,9 @@ class Knight
     @board = board
   end
 
-  def rec(row, col)
+  def rec(row, col, j = nil)
     
-  steps_row = [
+    steps_row = [
         -2, 
         -2, 
         -1, 
@@ -177,23 +253,21 @@ class Knight
         +2
       ]
 
-      j = 0
+      j = 0 if j == nil
       new_row = nil
       new_col = nil
     
-      for rowx in steps_row
+     
       
-        new_row = rowx + row
+      new_row = steps_row[j] + row
       
-        new_col = steps_col[j] + col
+      new_col = steps_col[j] + col
       
-        if (0..7).include?(new_row) && (0..7).include?(new_col)
-          @game.possible_moves(j, i, @start, curr_square, new_row, new_col) 
-      
-        end
-      
-          j += 1
+      if (0..7).include?(new_row) && (0..7).include?(new_col)
+        return [new_row, new_col]
       end
+      
+    end
 
 end
 board = Board.new
