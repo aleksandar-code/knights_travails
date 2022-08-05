@@ -1,11 +1,5 @@
 # frozen_string_literal: true
 
-require 'pry-byebug'
-
-# 4,4 then lower is 2 down 4,2 and 1 down 3,2 for the left for the right
-# it's up and not down. next level is 1 down two up or down for either sides, upper levels are same
-
-
 class Node
     
     attr_accessor :data, :neighbors, :visited
@@ -35,7 +29,6 @@ class Graph
     @nodes << Node.new(value)
     end
 
-
     def get_node(data)
         @nodes.each_with_index do |n, idx|
             if data == n.data
@@ -55,7 +48,6 @@ class Graph
     def traverse_bfs(starting_square, destination_square)
         
         @destination_square = destination_square
-
         moves = 0
         until @path.include?([2, 1]) # until path include an edge of starting square
             root = @nodes[get_idx(starting_square)]
@@ -83,9 +75,6 @@ class Graph
                 current.neighbors.each do |neighbor|
                     queue << neighbor if !(neighbor.visited)
                 end
-                
-                
-                
                 array << current.data
                 current.neighbors.each do |neighbor|
                     if neighbor.data == @destination_square
@@ -97,13 +86,9 @@ class Graph
                         queue = []
                     end
                 end
-                
             end
-
             queue = queue[1..] if !(queue.empty?)
         end
-        
-        
         return 
     end
 
@@ -119,26 +104,21 @@ class Board
   attr_accessor :board, :array, :adjacency_list
 
   def knight_moves(starting_square, destination_square)
-
-
     @knight = Knight.new(self, starting_square, @board)
-    # add nodes.
+    # add nodes
     @board.each_with_index do |row, idx|
         row.each do |col|
             @adjacency_list.add_node([idx, col])
         end
     end
-   
+
     # add edges
-    
     @adjacency_list.nodes.each do |node|
 
         j = 0
         8.times do
             data = @knight.rec(node.data[0], node.data[1], j)
-
             if !(data == nil)
-
                 neigh = @adjacency_list.get_node(data)    # get neighbor 
                 node.add_edge(neigh)
             end
@@ -146,8 +126,6 @@ class Board
         end
     end
     @adjacency_list.traverse_bfs(starting_square, destination_square)
-    binding.pry
-
   end
   
   def display_board
@@ -156,8 +134,6 @@ class Board
       print "row #{idx}: #{row}\n"
     end
   end
-
-
 end
 
 class Knight
@@ -195,8 +171,6 @@ class Knight
       new_row = nil
       new_col = nil
     
-     
-      
       new_row = steps_row[j] + row
       
       new_col = steps_col[j] + col
