@@ -102,11 +102,12 @@ end
 
 class Node
     
-    attr_accessor :data, :next
+    attr_accessor :data, :next, :visited
 
     def initialize(data, next_node = nil)
         @data = data
         @next = next_node
+        @visited = false
     end
 
 end
@@ -134,10 +135,44 @@ class Graph
 # so first i'll have to get in the square 0,0 check if 3,3 is an edge, if not then check the children of the children of 0,0.
 # use DFS AND BFS, i want to take the children of my starting square 0,0 and then link them via paths to 3,3
 
-    # def dfs_bfs
-    #     check_edge()
-    #     count_edges()
-    # end
+# 0,0 first put adjacent nodes in queue
+
+    def traverse_bfs(root, dst)
+        queue = []
+        array = []
+        root = @alist[root].head
+        dst = @alist[dst].head
+        queue << root
+        i = 0
+        
+        while !(queue.empty?)
+            binding.pry
+
+            if current_root == dst
+                return i
+            end
+
+            current_root = queue[0]
+            8.times do
+                binding.pry
+                if !(current_root.next.nil?) && !(current_root.visited)
+                    current_root.next.visited = true
+                    queue.push(current_root.next)
+                else
+                    return
+                end
+                current_root = current_root.next
+
+            end
+
+            if !(current_root.next.data.nil?) && !(current_root.next.data.visited)
+                queue.push(current_root.next.data) 
+                current_root.visited = true
+            end
+
+            queue = queue[1..]
+        end
+    end
 
     # data gives access to the nodes in a linked list SO if my dst_node isn't in the current linked list, i search in curr_node.next.data
     # next gives acess to a adjacent node SO if my dst_node isn't equal to current node i look up the next node.
@@ -152,27 +187,7 @@ class Graph
 
     # Result i checked 0,0 1,2 2,1 and queued the children of 1,2 and 2,1
 
-    def count_edges(src, dst, edges = 0)
-        binding.pry
-        current_list = @alist[src]
-        dst_node = @alist[dst].head
-        curr_node = current_list.head
-        edges = 0 
-        until curr_node == false
-            if curr_node.data == dst_node
-                return edges + 1
-            end
-            edges += 1
-            if !(curr_node.nil?)
-                curr_node = curr_node.next
-                src = search_node(curr_node.data.data)
-                p check_edge(src, dst)
-            else
-                curr_node = false
-            end
-        end
-        
-    end
+  
 
     def check_edge(src, dst)
         current_list = @alist[src]
@@ -257,7 +272,7 @@ class Board
 
     destination_square = @adjacency_list.search_node(destination_square)
 
-    p @adjacency_list.count_edges(starting_square, destination_square)
+    p @adjacency_list.traverse_bfs(starting_square, destination_square)
     p @adjacency_list.print_
     binding.pry
 
