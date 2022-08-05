@@ -5,224 +5,106 @@ require 'pry-byebug'
 # 4,4 then lower is 2 down 4,2 and 1 down 3,2 for the left for the right
 # it's up and not down. next level is 1 down two up or down for either sides, upper levels are same
 
-class LinkedList
-    #is_empty?: return true if the linked list is empty
-    def is_empty?
-        if @head == nil
-            return true
-        else
-            return false
-        end
-    end
-    attr_accessor :head
-    #push: given a data, add a new node in the end
-    def push(data)
-        if self.is_empty?
-            @head = Node.new(data)
-        else
-            current_node = @head
-            new_node = Node.new(data)
-            while current_node.next != nil
-                current_node = current_node.next
-            end
-            current_node.next = new_node
-        end
-    end
-    #unshift: add a new node in the front
-    def unshift(data)
-        if self.is_empty?
-            @head = Node.new(data)
-        else
-            curr_head = Node.new(data)
-            curr_head.next = @head
-            @head = curr_head
-        end
-    end
-    #pop: remove the last node and return it
-    def pop
-        if self.is_empty?
-            return "This list is currently empty"
-        else
-            current_node = @head
-            while current_node.next.next != nil
-                current_node = current_node.next
-            end
-            last_node = current_node.next
-            current_node.next = nil
-        end
-        last_node
-    end
-    #shift: remove the first node and return it
-    def shift
-        if self.is_empty?
-            return "This list is currently empty"
-        else
-            curr_head = @head
-            new_head = @head.next
-            @head.next = nil
-            @head = new_head
-        end
-        curr_head
-    end
-    #size: return the length of linked list
-    def size
-        if self.is_empty?
-            count = 0
-        else
-            count = 1
-            current_node = @head
-            while current_node.next != nil
-                current_node = current_node.next
-                count += 1
-            end
-        end
-        count
-    end
-    #pretty_print: print the current linked list as an array
-    def pretty_print
-        array = []
-        current_node = @head
-        if self.is_empty?
-            return array
-        else
-            while current_node.next != nil
-                array << current_node.data
-                current_node = current_node.next
-            end
-            array << current_node.data
-       end
-       array
-    end
-    #clear: clear the whole linked list
-    def clear
-        @head = nil
-    end
-
-end
 
 class Node
     
-    attr_accessor :data, :next, :visited
+    attr_accessor :data, :neighbors, :visited
 
-    def initialize(data, next_node = nil)
+    def initialize(data)
         @data = data
-        @next = next_node
+        @neighbors = []
         @visited = false
     end
 
+    def add_edge(neighbor)
+        @neighbors << neighbor
+    end
 end
 
 class Graph
+
+    attr_accessor :nodes, :path, :destination_square
+
     def initialize
-        @alist = Array.new()
-    end
-    attr_accessor :alist
-
-    def add_node(row, col)
-        linked_list = LinkedList.new
-        linked_list.push([row, col])
-        @alist << linked_list
+        @nodes = []
+        @destination_square = nil
+        @path = []
     end
 
-    def add_edge(src, dst)
-        current_list = @alist[src]
-
-        dst_node = @alist[dst].head
-
-        current_list.push(dst_node)
-
+    def add_node(value)
+    @nodes << Node.new(value)
     end
-# so first i'll have to get in the square 0,0 check if 3,3 is an edge, if not then check the children of the children of 0,0.
-# use DFS AND BFS, i want to take the children of my starting square 0,0 and then link them via paths to 3,3
 
-# 0,0 first put adjacent nodes in queue
 
-    def traverse_bfs(root, dst)
-        queue = []
-        array = []
-        root = @alist[root].head
-        dst = @alist[dst].head
-        queue << root
-        i = 0
-        
-        while !(queue.empty?)
-            binding.pry
-
-            if current_root == dst
-                return i
+    def get_node(data)
+        @nodes.each_with_index do |n, idx|
+            if data == n.data
+                return n
             end
-
-            current_root = queue[0]
-            8.times do
-                binding.pry
-                if !(current_root.next.nil?) && !(current_root.visited)
-                    current_root.next.visited = true
-                    queue.push(current_root.next)
-                else
-                    return
-                end
-                current_root = current_root.next
-
-            end
-
-            if !(current_root.next.data.nil?) && !(current_root.next.data.visited)
-                queue.push(current_root.next.data) 
-                current_root.visited = true
-            end
-
-            queue = queue[1..]
         end
     end
 
-    # data gives access to the nodes in a linked list SO if my dst_node isn't in the current linked list, i search in curr_node.next.data
-    # next gives acess to a adjacent node SO if my dst_node isn't equal to current node i look up the next node.
-
-    # 0,0
-    # Or i enter linkedlist 0,0; i check if the next node is equal dst node if not i then check if it is in his children i queue his children
-    # then i check if the next node is equal to dst_node if not i then check if it is in his children i queue his children
-    # 1,2 2,1
-    # Then i check the next node if it is equal to my dst node if not then i check in his children and i queue his children
-    # Then i check the next node if it is equal to my dst node if not then i check in his children and i queue his children
-    # and repeat this until i found 2 path to my dst_node as 0,0 gives to 2 moves (1,2 and 2,1)
-
-    # Result i checked 0,0 1,2 2,1 and queued the children of 1,2 and 2,1
-
-  
-
-    def check_edge(src, dst)
-        current_list = @alist[src]
-        dst_node = @alist[dst].head
-        curr_node = current_list.head
-        until curr_node == nil
-            if curr_node.data == dst_node
-                return true
-            end
-            curr_node = curr_node.next
-        end
-        return false
-    end
-
-    def search_node(data)
-
-        @alist.each_with_index do |list, idx|
-            if list.head.data == data
+    def get_idx(data)
+        @nodes.each_with_index do |n, idx|
+            if data == n.data
                 return idx
             end
         end
     end
 
-    def print_()
-        for current_list in @alist
-            curr_node = current_list.head
-            i = 0
-            until curr_node == nil
-                print "#{curr_node.data} -> " if i == 0
-                print "#{curr_node.data.data} -> " if i > 0
-                i += 1
-                curr_node = curr_node.next
+    def traverse_bfs(starting_square, destination_square)
+        
+        @destination_square = destination_square
+
+        moves = 0
+        until @path.include?([2, 1]) # until path include an edge of starting square
+            root = @nodes[get_idx(starting_square)]
+            queue = []
+            queue << root
+            path.unshift(@destination_square)
+            @nodes.each do |node|
+                node.visited = false
             end
-            print "\n"
+            bfs(queue)
+            moves += 1
         end
+        puts "You made it in #{moves} moves!"
+        p starting_square
+        @path.each { |a| p a }
+    end
+    
+    def bfs(queue)
+        array = []
+        while !(queue.empty?)
+            current = queue[0]
+            if !(current.visited)
+            
+                current.visited = true
+                current.neighbors.each do |neighbor|
+                    queue << neighbor if !(neighbor.visited)
+                end
+                
+                
+                
+                array << current.data
+                current.neighbors.each do |neighbor|
+                    if neighbor.data == @destination_square
+
+                        @destination_square = array[-1]
+                        
+                        
+                        
+                        queue = []
+                    end
+                end
+                
+            end
+
+            queue = queue[1..] if !(queue.empty?)
+        end
+        
+        
+        return 
     end
 
 end
@@ -237,43 +119,33 @@ class Board
   attr_accessor :board, :array, :adjacency_list
 
   def knight_moves(starting_square, destination_square)
-    binding.pry
+
 
     @knight = Knight.new(self, starting_square, @board)
     # add nodes.
     @board.each_with_index do |row, idx|
         row.each do |col|
-            @adjacency_list.add_node(idx, col)
+            @adjacency_list.add_node([idx, col])
         end
     end
    
     # add edges
     
-        @board.each_with_index do |row, idx|
-            row.each do |col|
-                j = 0
-                8.times do 
+    @adjacency_list.nodes.each do |node|
 
-                    data = @knight.rec(idx, col, j)
-                    if !(data == nil)
-                        dst = @adjacency_list.search_node(data)  # get index of the dst
-                        data = [idx, col]
-                        src = @adjacency_list.search_node(data)  # get index of the dst
-                        @adjacency_list.add_edge(src, dst)
-                        
-                    end
-                    j += 1
-                end
+        j = 0
+        8.times do
+            data = @knight.rec(node.data[0], node.data[1], j)
+
+            if !(data == nil)
+
+                neigh = @adjacency_list.get_node(data)    # get neighbor 
+                node.add_edge(neigh)
             end
+            j += 1
         end
-    
-
-    starting_square = @adjacency_list.search_node(starting_square)
-
-    destination_square = @adjacency_list.search_node(destination_square)
-
-    p @adjacency_list.traverse_bfs(starting_square, destination_square)
-    p @adjacency_list.print_
+    end
+    @adjacency_list.traverse_bfs(starting_square, destination_square)
     binding.pry
 
   end
@@ -340,4 +212,4 @@ board = Board.new
 
 board.display_board
 
-board.knight_moves([0, 0], [3, 3])
+board.knight_moves([0, 0], [7, 7])
