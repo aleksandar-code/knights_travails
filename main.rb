@@ -45,11 +45,17 @@ class Graph
         end
     end
 
+    def get_edge(data)
+        start = @nodes[get_idx(data)]
+        edge = start.neighbors[0].data
+        return edge
+    end
     def traverse_bfs(starting_square, destination_square)
         
         @destination_square = destination_square
         moves = 0
-        until @path.include?([2, 1]) # until path include an edge of starting square
+        edge = get_edge(starting_square)
+        until @path.include?(edge) # until path include an edge of starting square 
             root = @nodes[get_idx(starting_square)]
             queue = []
             queue << root
@@ -167,23 +173,14 @@ class Knight
         +2
       ]
 
-      j = 0 if j == nil
-      new_row = nil
-      new_col = nil
-    
-      new_row = steps_row[j] + row
-      
-      new_col = steps_col[j] + col
-      
-      if (0..7).include?(new_row) && (0..7).include?(new_col)
-        return [new_row, new_col]
-      end
-      
-    end
-
+    j = 0 if j == nil
+    new_row = steps_row[j] + row
+    new_col = steps_col[j] + col
+    return [new_row, new_col] if (0..7).include?(new_row) && (0..7).include?(new_col)
+  end
 end
 board = Board.new
 
 board.display_board
 
-board.knight_moves([0, 0], [7, 7])
+board.knight_moves([3, 3], [0, 0])
