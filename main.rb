@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+require 'pry-byebug'
 class Node
     
     attr_accessor :data, :neighbors, :visited
@@ -69,6 +69,7 @@ class Graph
         puts "You made it in #{moves} moves!"
         p starting_square
         @path.each { |a| p a }
+        @path = []
     end
     
     def bfs(queue)
@@ -152,28 +153,28 @@ class Knight
   def rec(row, col, j = nil)
     
     steps_row = [
-        -2, 
-        -2, 
-        -1, 
-        -1, 
-        +2, 
-        +2, 
-        +1, 
-        +1 
-      ]
-
-      steps_col = [
-        -1,
-        +1,
         -2,
+        -2,
+        -1,
+        -1,
         +2,
-        -1,
+        +2,
         +1,
-        -2,
-        +2
-      ]
+        +1
+    ]
 
-    j = 0 if j == nil
+    steps_col = [
+      -1,
+      +1,
+      -2,
+      +2,
+      -1,
+      +1,
+      -2,
+      +2
+    ]
+
+    j = 0 if j.nil?
     new_row = steps_row[j] + row
     new_col = steps_col[j] + col
     return [new_row, new_col] if (0..7).include?(new_row) && (0..7).include?(new_col)
@@ -184,3 +185,6 @@ board = Board.new
 board.display_board
 
 board.knight_moves([3, 3], [0, 0])
+board.knight_moves([0, 0], [3, 3])
+board.knight_moves([3, 3], [4, 3])
+board.knight_moves([0, 0], [7, 7])
