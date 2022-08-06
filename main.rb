@@ -109,7 +109,7 @@ class Board
     @adjacency_list.nodes.each do |node|
       j = 0
       8.times do
-        data = @knight.rec(node.data[0], node.data[1], j)
+        data = @knight.adjacent(node.data[0], node.data[1], j)
         unless data.nil?
           neigh = @adjacency_list.get_node(data) # get neighbor
           node.add_edge(neigh)
@@ -136,29 +136,9 @@ class Knight
     @board = board
   end
 
-  def rec(row, col, count = nil)
-    steps_row = [
-      -2,
-      -2,
-      -1,
-      -1,
-      +2,
-      +2,
-      +1,
-      +1
-    ]
-
-    steps_col = [
-      -1,
-      +1,
-      -2,
-      +2,
-      -1,
-      +1,
-      -2,
-      +2
-    ]
-
+  def adjacent(row, col, count = nil)
+    steps_row = [-2, -2, -1, -1, +2, +2, +1, +1]
+    steps_col = [-1, +1, -2, +2, -1, +1, -2, +2]
     count = 0 if count.nil?
     new_row = steps_row[count] + row
     new_col = steps_col[count] + col
