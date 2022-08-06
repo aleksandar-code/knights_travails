@@ -1,7 +1,8 @@
 # frozen_string_literal: true
-
+require 'pry-byebug'
 class Node
   attr_accessor :data, :neighbors, :visited
+
   def initialize(data)
     @data = data
     @neighbors = []
@@ -97,15 +98,27 @@ class Board
   attr_accessor :board, :array, :adjacency_list
 
   def knight_moves(starting_square, destination_square)
-    @knight = Knight.new(self, starting_square, @board)
-    # add nodes
-    @board.each_with_index do |row, idx|
-      row.each do |col|
-        @adjacency_list.add_node([idx, col])
-      end
-    end
+    return unless valid_input?(starting_square) && valid_input?(destination_square)
 
-    # add edges
+    build
+    @adjacency_list.traverse_bfs(starting_square, destination_square)
+  end
+
+  def build
+    @knight = Knight.new(self)
+    add_nodes
+    add_edges
+  end
+
+  def add_nodes
+    @board.each_with_index do |row, idx|
+        row.each do |col|
+          @adjacency_list.add_node([idx, col])
+        end
+      end
+  end
+
+  def add_edges
     @adjacency_list.nodes.each do |node|
       j = 0
       8.times do
@@ -117,7 +130,6 @@ class Board
         j += 1
       end
     end
-    @adjacency_list.traverse_bfs(starting_square, destination_square)
   end
 
   def display_board
@@ -126,14 +138,16 @@ class Board
       print "row #{idx}: #{row}\n"
     end
   end
+
+  def valid_input?(coord)
+    return true if (0..7).include?(coord[0]) && (0..7).include?(coord[1])
+  end
 end
 
-#  Knight
+# Knight
 class Knight
-  def initialize(game, start, board)
+  def initialize(game)
     @game = game
-    @start = start
-    @board = board
   end
 
   def adjacent(row, col, count = nil)
@@ -142,7 +156,11 @@ class Knight
     count = 0 if count.nil?
     new_row = steps_row[count] + row
     new_col = steps_col[count] + col
-    return [new_row, new_col] if (0..7).include?(new_row) && (0..7).include?(new_col)
+    valid_square?(new_row, new_col)
+  end
+
+  def valid_square?(row, col)
+    return [row, col] if (0..7).include?(row) && (0..7).include?(col)
   end
 end
 board = Board.new
