@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require 'pry-byebug'
+
 class Node
   attr_accessor :data, :neighbors, :visited
 
@@ -41,8 +41,7 @@ class Graph
 
   def get_edge(data)
     start = @nodes[get_idx(data)]
-    edge = start.neighbors[0].data
-    edge
+    start.neighbors[0].data
   end
 
   def traverse_bfs(starting_square, destination_square)
@@ -92,7 +91,7 @@ end
 class Board
   def initialize
     @board = Array.new(8) { [*0..7] }
-    @knight = nil
+    @knight = Knight.new(self)
     @adjacency_list = Graph.new
   end
   attr_accessor :board, :array, :adjacency_list
@@ -105,29 +104,24 @@ class Board
   end
 
   def build
-    @knight = Knight.new(self)
     add_nodes
     add_edges
   end
 
   def add_nodes
     @board.each_with_index do |row, idx|
-        row.each do |col|
-          @adjacency_list.add_node([idx, col])
-        end
+      row.each do |col|
+        @adjacency_list.add_node([idx, col])
       end
+    end
   end
 
   def add_edges
     @adjacency_list.nodes.each do |node|
-      j = 0
-      8.times do
-        data = @knight.adjacent(node.data[0], node.data[1], j)
-        unless data.nil?
-          neigh = @adjacency_list.get_node(data) # get neighbor
-          node.add_edge(neigh)
-        end
-        j += 1
+      arr_data = @knight.adjacent(node.data[0], node.data[1])
+      arr_data.each do |data|
+        neigh = @adjacency_list.get_node(data) # get neighbor
+        node.add_edge(neigh)
       end
     end
   end
@@ -150,17 +144,20 @@ class Knight
     @game = game
   end
 
-  def adjacent(row, col, count = nil)
+  def adjacent(row, col, count = 0, array = [])
     steps_row = [-2, -2, -1, -1, +2, +2, +1, +1]
     steps_col = [-1, +1, -2, +2, -1, +1, -2, +2]
-    count = 0 if count.nil?
-    new_row = steps_row[count] + row
-    new_col = steps_col[count] + col
-    valid_square?(new_row, new_col)
+    8.times do
+      new_row = steps_row[count] + row
+      new_col = steps_col[count] + col
+      array << [new_row, new_col] if valid_square?(new_row, new_col)
+      count += 1
+    end
+    array
   end
 
   def valid_square?(row, col)
-    return [row, col] if (0..7).include?(row) && (0..7).include?(col)
+    true if (0..7).include?(row) && (0..7).include?(col)
   end
 end
 board = Board.new
