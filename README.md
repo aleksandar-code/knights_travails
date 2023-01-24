@@ -6,7 +6,7 @@ Assignment for the Ruby course of <a href="https://www.theodinproject.com/" rel=
 
 Specifications and details for the assignment can be found <a href="https://www.theodinproject.com/lessons/ruby-knights-travails" rel="nofollow">here</a>.
 
-Try here <a href="https://replit.com/@Shiisui/knights-travails#main.rb" rel="nofollow">Knigths travails/a>.
+Try here <a href="https://replit.com/@Shiisui/knights-travails#main.rb" rel="nofollow">Knigths travails</a>.
 
 ## Features
 
